@@ -1,0 +1,28 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "Pokemon json schema",
+    "type": "object",
+    "required": [
+      "pokadex_id",
+      "name",
+      "nickname",
+      "level",
+      "type",
+      "skills"
+    ],
+    "additional_properties": false,
+    "properties": {
+      "pokadex_id": {"type": "integer"},
+      "name": {"type": "string"},
+      "nickname": {"type": "string"},
+      "level": {"type": "integer"},
+      "type": {"type": "string",
+        "enum": ["ELECTRIC", "GROUND", "FIRE", "WATER", "WIND", "PSYCHIC", "GRASS"]
+      },
+      "skills": {
+        "type": "array",
+        "items": {"type": "string"},
+        "additionalItems": false
+      }
+    }
+}
