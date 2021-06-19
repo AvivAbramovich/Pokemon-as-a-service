@@ -9,13 +9,6 @@ from werkzeug.wrappers import Response
 from paas.bl import PokemonBL, NotValidPokemonError
 from paas.dal.es_dal import ESPokemonDAL
 
-
-app = Flask(__name__)
-app.wsgi_app = DispatcherMiddleware(
-    Response('Not Found', status=404),
-    {'/api': app.wsgi_app}
-)
-
 with open(os.path.join(os.path.dirname(__file__), 'pokemon_schema.json')) as f:
     bl = PokemonBL(json.load(f), ESPokemonDAL())
 
@@ -25,6 +18,12 @@ try:
 except Exception as e:
     logging.error(f'Health check failed: %s', str(e))
     exit(1)
+
+app = Flask(__name__)
+app.wsgi_app = DispatcherMiddleware(
+    Response('Not Found', status=404),
+    {'/api': app.wsgi_app}
+)
 
 
 @app.route('/', methods=['PUT', 'POST'])
