@@ -1,3 +1,4 @@
+import dataclasses
 from typing import List, Optional
 
 from elasticsearch import Elasticsearch
@@ -9,15 +10,25 @@ from paas.pokemon import Pokemon
 class ESPokemonDAL(IPokemonDAL):
     def __init__(self,
                  es_client: Optional[Elasticsearch] = None,
-                 index_name: str = 'Pokemon'):
+                 index_name: str = 'pokemon'):
         self._es_client = es_client if es_client else client_from_env()
         self._index_name = index_name
 
     def create_pokemon(self, pokemon: Pokemon):
-        self._es_client.index(self._index_name, body=pokemon)
+        # TODO: do pokemon have unique id? is nickname unique?
+        self._es_client.index(self._index_name, body=pokemon.as_dict())
 
-    def autocomplete(self, query: str) -> List[Pokemon]:
-        raise NotImplementedError()
+    def search(self, query: str) -> List[Pokemon]:
+        body = {
+            'query': {'query_string': {'query': f'*{query}*'}}
+        }
+        results = self._es_client.search(index=self._index_name, body=body)
+        hits = results['hits']['hits']
+        return [Pokemon(**hit['_source']) for hit in hits]
+
+    def health_check(self):
+        if not self._es_client.ping():
+            raise Exception('Database ping failed')
 
 
 def client_from_env(

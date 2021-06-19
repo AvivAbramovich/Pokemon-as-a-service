@@ -10,5 +10,8 @@ class IPokemonDAL(ABC):
         pass
 
     @abstractmethod
-    def autocomplete(self, query: str) -> List[Pokemon]:
+    def search(self, query: str) -> List[Pokemon]:
+        pass
+
+    def health_check(self):
         pass

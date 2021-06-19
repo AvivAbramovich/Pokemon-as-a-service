@@ -10,3 +10,6 @@ class Pokemon:
     level: int
     type: str
     skills: List[str]
+
+    def as_dict(self):
+        return dataclasses.asdict(self)

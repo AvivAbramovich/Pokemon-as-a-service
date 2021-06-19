@@ -1,3 +1,4 @@
+import json
 from typing import Dict, List
 
 import jsonschema
@@ -6,8 +7,12 @@ from paas.pokemon import Pokemon
 from paas.dal import IPokemonDAL
 
 
-class PokemonBlError(Exception):
-    pass
+class NotValidPokemonError(Exception):
+    def __init__(self, data: Dict):
+        self.invalid_data = data
+
+    def __str__(self):
+        return f'The given dictionary is not a valid Pokemon: "{json.dumps(self.invalid_data)}"'
 
 
 class PokemonBL:
@@ -15,15 +20,16 @@ class PokemonBL:
         self._schema = pokemon_schema
         self._dal = dal
 
-    def index_pokemon(self, d: Dict) -> bool:
+    def health(self):
+        self._dal.health_check()
+
+    def index_pokemon(self, d: Dict):
         try:
             jsonschema.validate(d, self._schema)
         except jsonschema.exceptions.ValidationError:
-            raise PokemonBlError('The given dictionary is not a valid Pokemon')
+            raise NotValidPokemonError(d)
         p = Pokemon(**d)
-        index_res = self._dal.create_pokemon(p)
-        # TODO: return true if index succeed
-        raise NotImplementedError()
+        self._dal.create_pokemon(p)
 
     def query(self, query: str) -> List[Pokemon]:
-        raise NotImplementedError()
+        return self._dal.search(query)
