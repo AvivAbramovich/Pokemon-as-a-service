@@ -7,7 +7,7 @@ ENV ES_HOST ''
 ENV ES_PORT 9200
 ENV FLASK_APP=paas.app
 
-ADD paas/requirements.txt .
+ADD requirements.txt .
 RUN pip install -r requirements.txt
 
 ADD paas paas
