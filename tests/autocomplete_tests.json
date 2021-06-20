@@ -1,0 +1,22 @@
+[
+  {
+    "query": "pik",
+    "result_pokemons_id": [25]
+  },
+  {
+    "query": "grow",
+    "result_pokemons_id": [25, 1]
+  },
+  {
+    "query": "geve",
+    "result_pokemons_id": [25]
+  },
+  {
+    "query": "leaf",
+    "result_pokemons_id": [1]
+  },
+  {
+    "query": "something",
+    "result_pokemons_id": []
+  }
+]

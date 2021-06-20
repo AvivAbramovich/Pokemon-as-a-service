@@ -20,7 +20,7 @@ class ESPokemonDAL(IPokemonDAL):
 
     def search(self, query: str) -> List[Pokemon]:
         body = {
-            'query': {'query_string': {'query': f'*{query}*'}}
+            'query': {'query_string': {'query': f'{query}*'}}
         }
         results = self._es_client.search(index=self._index_name, body=body)
         hits = results['hits']['hits']

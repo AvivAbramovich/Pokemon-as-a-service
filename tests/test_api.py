@@ -1,7 +1,7 @@
 import os
 import json
 import random
-from typing import List, Dict
+from typing import List, Dict, Set
 import time
 
 import requests
@@ -31,22 +31,18 @@ def test_put_pokemon():
 def test_search_pokemon():
     # sleep for 2 seconds because ES index takes some time to index new records
     time.sleep(2)
-    for pokemon in test_pokemon:
-        print(f'test search on pokemon "{pokemon["name"]}"')
-        text_keys = list(filter(lambda key: type(pokemon[key]) is not int,
-                                pokemon.keys()))
-        for ind in range(NUM_TESTS):
-            # choose random key
-            key = random.choice(text_keys)
-            value = pokemon[key]
-            if key == 'skills':
-                value = random.choice(value)
-            query = get_random_str(value, random.randint(1, len(value)))
-            print(f'test {ind + 1} - query="{query}" (key="{key}", value="{value}")')
-            res = requests.get(API_BASE + '/autocomplete/' + query, json=pokemon)
-            assert res.ok
-            assert res.headers['content-type'] == 'application/json'
-            results = res.json()
-            assert len(results)
-            assert any(map(lambda item: item == pokemon, results))
+    with open(os.path.join(os.path.dirname(__file__), 'autocomplete_tests.json')) as f:
+        autocomplete_tests: List[Dict] = json.load(f)
 
+    for ind, test in enumerate(autocomplete_tests, 1):
+        query: str = test['query']
+        expected_results: Set[int] = set(test['result_pokemons_id'])
+
+        print(f'test {ind} - {query=} [expecting {len(expected_results)} result(s)]')
+        res = requests.get(API_BASE + '/autocomplete/' + query, json=query)
+        assert res.ok
+        assert res.headers['content-type'] == 'application/json'
+        results = res.json()
+
+        results = set([d['pokadex_id'] for d in results])
+        assert results == expected_results
